@@ -60,7 +60,9 @@ def test_render_postgres_url_uses_psycopg():
 
 def test_production_hides_api_documentation():
     config = Settings(
-        database_url="postgresql://user:password@localhost/database", app_env="production"
+        database_url="postgresql://user:password@localhost/database",
+        app_env="production",
+        public_origin="https://example.org",
     )
     with TestClient(create_app(config)) as client:
         assert client.get("/docs").status_code == 404
