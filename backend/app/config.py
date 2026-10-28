@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, SecretStr, field_validator
+from pydantic import AliasChoices, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
 
@@ -15,6 +15,29 @@ class Settings(BaseSettings):
     app_env: Literal["development", "test", "production"] = "development"
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
     static_dir: Path | None = None
+    public_origin: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("PUBLIC_ORIGIN", "RENDER_EXTERNAL_URL", "public_origin"),
+    )
+    session_ttl_seconds: int = Field(default=3600, ge=300, le=86400)
+
+    @field_validator("public_origin")
+    @classmethod
+    def valid_public_origin(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        cls.validate_origins([value])
+        return value
+
+    @model_validator(mode="after")
+    def production_origin_required(self):
+        if self.app_env == "production" and (
+            not self.public_origin or not self.public_origin.startswith("https://")
+        ):
+            raise ValueError(
+                "PUBLIC_ORIGIN or RENDER_EXTERNAL_URL must be an HTTPS origin in production"
+            )
+        return self
 
     @field_validator("database_url")
     @classmethod
