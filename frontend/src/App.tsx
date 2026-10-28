@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { en } from './i18n/en';
 import { ur } from './i18n/ur';
+import { Workspace } from './Workspace';
 
 type Health = 'checking' | 'healthy' | 'unavailable';
 
@@ -62,9 +63,10 @@ export function App() {
           </div>
         </section>
         <aside className="development-note"><span className="note-icon" aria-hidden="true">i</span><div><strong>{t.development}</strong><p>{t.developmentDetail}</p></div></aside>
+        <Workspace t={t.auth} language={language} />
         <section className="roadmap" aria-labelledby="roadmap-title">
           <div className="section-heading"><h2 id="roadmap-title">{t.roadmapTitle}</h2><p>{t.roadmapDescription}</p></div>
-          <div className="step-grid">{t.steps.map((step, index) => <article className={`step ${index === 0 ? 'current' : ''}`} key={index}>
+          <div className="step-grid">{t.steps.map((step, index) => <article className={`step ${index === 1 ? 'current' : ''}`} key={index}>
             <div className="step-top"><span className="step-number">{step.number}</span><span className="step-status">{step.status}</span></div>
             <h3>{step.title}</h3><p>{step.description}</p>
           </article>)}</div>

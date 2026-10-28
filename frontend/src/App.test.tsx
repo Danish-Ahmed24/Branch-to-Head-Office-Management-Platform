@@ -5,7 +5,7 @@ import { App } from './App';
 afterEach(() => vi.unstubAllGlobals());
 
 function mockHealth(status: number, body: unknown) {
-  const mock = vi.fn().mockResolvedValue({ ok: status === 200, json: async () => body });
+  const mock = vi.fn().mockImplementation((url: string) => Promise.resolve(url === '/api/auth/me' ? { ok: false, status: 401 } : { ok: status === 200, status, json: async () => body }));
   vi.stubGlobal('fetch', mock);
   return mock;
 }
@@ -32,10 +32,10 @@ test('shows failure and retries when database becomes available', async () => {
   const fetch = mockHealth(503, { status: 'unavailable' });
   render(<App />);
   await screen.findByText('Service not ready');
-  fetch.mockResolvedValue({ ok: true, json: async () => ({ status: 'ok' }) });
+  fetch.mockImplementation((url: string) => Promise.resolve(url === '/api/auth/me' ? { ok: false, status: 401 } : { ok: true, json: async () => ({ status: 'ok' }) }));
   fireEvent.click(screen.getByRole('button', { name: 'Check again' }));
   await screen.findByText('API and database connected');
-  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+  await waitFor(() => expect(fetch.mock.calls.filter(([url]) => url === '/api/health')).toHaveLength(2));
 });
 
 test('does not present malformed health payloads as ready', async () => {
