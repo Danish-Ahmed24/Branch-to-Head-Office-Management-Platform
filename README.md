@@ -6,7 +6,8 @@ A bilingual volunteer-organisation management platform for ShipLens Challenge
 **Current milestone: authentication and audit foundation.** Database-aware
 health, a bilingual React login workspace, five roles, scoped branch/audit
 reads, Super Admin user creation, PostgreSQL migrations, and append-only
-auditing are implemented. Membership, money/reporting workflows, seven public
+auditing are implemented. The October 29 increment adds Super Admin branch
+creation, rename, and enforced lifecycle transitions. Membership, money/reporting workflows, seven public
 content pages, and official sample-data reconciliation remain future phases.
 There is no confirmed live Render deployment yet.
 

@@ -119,8 +119,8 @@ official sample dataset, and the command refuses production and nonempty
 identity databases. Use unique strong credentials for any public judge accounts.
 
 A Super Admin can create users through the bilingual interface. Existing
-branch assignments are selectable; branch creation/lifecycle administration
-will arrive in the next domain phase. There are no password reset or user
+branch assignments are selectable. The October 29 increment adds branch
+creation, rename, and lifecycle administration. There are no password reset or user
 update/deactivation interfaces yet. Recover administrative access through an
 explicitly reviewed operator procedure, never by silently resetting passwords
 in the seed command.
@@ -131,3 +131,19 @@ requires updating PUBLIC_ORIGIN. Local Compose intentionally sets development
 mode and http://localhost:8000; use that origin for browser login. Hot reload
 also permits the explicitly configured http://localhost:5173 origin. Do not
 carry the local development override into Render.
+
+## Branch administration (October 29)
+
+Sign in as Super Admin to create a branch using its name. The server allocates
+its code and initial Forming status; neither is a free-form field. Use the
+branch controls to rename or change status. Forming can become Active or
+Closed; Active can become Paused or Closed; Paused can become Active or Closed.
+Closed is terminal, and the code is retained permanently. A closing confirmation
+helps avoid accidental closure. There is no branch deletion feature.
+
+If a status change conflicts with another administrator's work, refresh the
+record and reassess the change before retrying. Lifecycle changes use a
+database row lock and expected current status. Creation, rename, and status
+changes appear in the audit trail with actor and before/after values.
+Other roles retain their existing read scopes and cannot change branches.
+No new environment variables or migrations are required for this increment.

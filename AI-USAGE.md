@@ -20,3 +20,9 @@ authentication separately from unit/integration suites. Tests cover database
 immutability, transaction rollback, role/branch denials, CSRF, sessions, login
 limits, and bilingual login behavior. Current evidence is in docs/progress.md. No finished third-party application
 is being imported.
+
+The October 29 branch-administration increment used backend, bilingual frontend,
+and independent review sub-agents. Validation includes endpoint role/CSRF
+denials, lifecycle transitions, concurrent mutation behavior, transactional
+auditing, and container HTTP checks. No later scheduled business phase was
+included in this increment.

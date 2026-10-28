@@ -2,9 +2,11 @@
 
 Phase 2 implements login for all five roles, user list/create permissions,
 scoped branch reads, and scoped audit reads. The remaining rows are the
-contract for future domain endpoints, not implemented features. All permissions default to denied. Public access
-is limited to published content, active public branch information, and
-submitting volunteer applications. Public health responses contain no secrets.
+contract for future domain endpoints. The October 29 phase additionally
+implements Super Admin branch creation, rename, and lifecycle changes.
+All permissions default to denied. Published content and volunteer applications
+are planned public capabilities; those endpoints do not exist yet. Public
+health responses contain no secrets.
 
 | Action | Super Admin | Finance Reviewer | Content Editor | Branch Lead | HR Lead |
 | --- | --- | --- | --- | --- | --- |
@@ -32,10 +34,12 @@ locks apply even to Super Admin. Finance scope covers collections/reports;
 HR scope covers applications/members. Separate tests must cover every grant,
 denial, cross-branch identifier substitution, export, and state transition.
 
-Proposed branch transitions: Forming → Active or Closed; Active → Paused or
+Enforced branch transitions: Forming → Active or Closed; Active → Paused or
 Closed; Paused → Active or Closed; Closed is terminal. Codes are never reused.
 
 Phase 2 has no audit mutation endpoints. PostgreSQL also rejects direct audit
 UPDATE, DELETE, and TRUNCATE. Role/session, branch scope, and mutation CSRF
 checks are exercised against a real PostgreSQL database. User update, role
-reassignment, branch mutation, and all remaining domain operations are pending.
+reassignment, and remaining domain operations are pending. Branch mutations
+require both Super Admin permission and valid CSRF/Origin, and are audited
+atomically. Other roles cannot mutate even their own assigned branch.
