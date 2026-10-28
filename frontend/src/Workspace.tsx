@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, validSession, type AuditEntry, type Branch, type Role, type Session, type User } from './api';
 import type { en } from './i18n/en';
+import { BranchAdmin } from './BranchAdmin';
 
 type Copy = typeof en.auth;
 type List<T> = { items: T[]; limit: number; offset: number };
@@ -105,6 +106,7 @@ function Records({ session, t, language, onExpired }: { session: Session; t: Cop
   const [message, setMessage] = useState('');
   const [attempt, setAttempt] = useState(0);
   const [created, setCreated] = useState(false);
+  const [branchNotice, setBranchNotice] = useState<{ message: string; error: boolean } | null>(null);
   const canReadBranches = session.user.role !== 'content_editor';
 
   useEffect(() => {
@@ -128,10 +130,11 @@ function Records({ session, t, language, onExpired }: { session: Session; t: Cop
     <button className="secondary-button refresh-button" disabled={loading} onClick={() => setAttempt(attempt + 1)}>{t.refresh}</button>
     {loading && <p role="status">{t.recordsLoading}</p>}
     {message && <p className="form-error" role="alert">{message}</p>}
+    {branchNotice && <p role={branchNotice.error ? 'alert' : 'status'} className={branchNotice.error ? 'form-error' : 'form-help'}>{branchNotice.message}</p>}
     {!loading && !message && <>
       {created && <p role="status">{t.created}</p>}
       {canReadBranches && <p className="form-help">{t.limitedRecords}</p>}
-      {canReadBranches && <section aria-labelledby="branches-heading"><h3 id="branches-heading">{t.branchRecords}</h3>{branches.length ? <ul className="branch-list">{branches.map((branch) => <li key={branch.id}><div><strong>{branch.name}</strong><span className="record-code" dir="ltr">{branch.code}</span></div><span className="step-status">{t.branchStatuses[branch.status as keyof Copy['branchStatuses']] ?? branch.status}</span></li>)}</ul> : <p>{t.noBranches}</p>}</section>}
+      {session.user.role === 'super_admin' ? <BranchAdmin branches={branches} session={session} t={t} onExpired={onExpired} onChanged={(notice, error = false) => { setBranchNotice({ message: notice, error }); setAttempt(attempt + 1); }} /> : canReadBranches && <section aria-labelledby="branches-heading"><h3 id="branches-heading">{t.branchRecords}</h3>{branches.length ? <ul className="branch-list">{branches.map((branch) => <li key={branch.id}><div><strong>{branch.name}</strong><span className="record-code" dir="ltr">{branch.code}</span></div><span className="step-status">{t.branchStatuses[branch.status as keyof Copy['branchStatuses']] ?? branch.status}</span></li>)}</ul> : <p>{t.noBranches}</p>}</section>}
       {session.user.role === 'super_admin' && <>
         <section aria-labelledby="users-heading"><h3 id="users-heading">{t.users}</h3>{users.length ? <ul className="branch-list">{users.map((user) => <li key={user.id}><div><strong>{user.display_name}</strong><span className="record-code">{user.email}</span></div><span>{t.roles[user.role]}</span></li>)}</ul> : <p>{t.noUsers}</p>}</section>
         <CreateUser session={session} branches={branches} t={t} onCreated={() => { setCreated(true); setAttempt(attempt + 1); }} onExpired={onExpired} />

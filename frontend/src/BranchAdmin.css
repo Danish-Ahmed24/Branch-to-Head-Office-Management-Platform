@@ -1,0 +1,12 @@
+.branch-create-form { margin-block: 1rem 1.5rem; padding: 1.25rem; background: var(--surface, #fff); border: 1px solid #dce5df; border-radius: 12px; }
+.branch-create-form .form-field { max-width: 36rem; }
+.branch-admin-list { list-style: none; padding: 0; display: grid; gap: 1rem; }
+.branch-admin-card { border: 1px solid #dce5df; border-radius: 12px; padding: 1.25rem; }
+.branch-admin-heading, .branch-inline-form { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.branch-admin-heading .step-status { margin-inline-start: auto; }
+.branch-inline-form { margin-block-start: 1rem; align-items: end; }
+.branch-inline-form .form-field { flex: 1; min-width: min(14rem, 100%); }
+.branch-inline-form button { margin-block-end: .15rem; }
+.branch-close-confirm { background: #fff5ed; border: 1px solid #dba87f; border-radius: 8px; padding: 1rem; margin-block-start: 1rem; }
+.branch-close-confirm button + button { margin-inline-start: .5rem; }
+@media (max-width: 480px) { .branch-inline-form { display: grid; } .branch-admin-heading { gap: .5rem; } }
