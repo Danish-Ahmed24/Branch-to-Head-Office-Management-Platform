@@ -11,6 +11,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.auth import router
+from app.branches import router as branches_router
 from app.config import Settings
 from app.database import make_engine, make_session_factory
 
@@ -70,6 +71,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return response
 
     app.include_router(router)
+    app.include_router(branches_router)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
