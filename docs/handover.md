@@ -2,8 +2,9 @@
 
 ## Current scope
 
-The foundation is a runnable scaffold, not a submission-ready platform. There
-are no demo logins or business tables yet. Do not load real personal data.
+The authentication/audit foundation is runnable, but not submission-ready.
+There are identity tables and explicitly provisioned login accounts; member,
+collection, reporting, and CMS workflows remain pending. Do not load real personal data.
 Only synthetic demo data is allowed. Official sample data and the twist are
 pending from the organizer.
 
@@ -16,7 +17,7 @@ pending from the organizer.
 2. Choose the feature branch for a temporary foundation preview or merge the
    reviewed foundation into `main` before creating the final deployment.
 3. Render injects `DATABASE_URL` from the database connection and provides
-   `PORT`. The image serves React and FastAPI under one origin. Leave
+   `PORT` and `RENDER_EXTERNAL_URL` (the default approved browser origin). The image serves React and FastAPI under one origin. Leave
    `CORS_ORIGINS=[]` for this production configuration.
 4. Check build logs and request `/health`: it must return 200 with a healthy
    database. Open the page and switch English/Urdu. An unavailable database
@@ -39,8 +40,8 @@ containing sensitive connection information.
 
 PostgreSQL data is stored in the `postgres_data` volume. Stopping services
 retains it; removing volumes destroys it. For production, configure database
-backups and test restore procedures before real use. Schema migrations and
-seed-data commands will be documented with the first domain-model phase.
+backups and test restore procedures before real use. Identity migrations and explicit account provisioning are documented below.
+Official sample-data loading remains pending.
 
 ## Continuation and submission
 
@@ -78,3 +79,55 @@ Git pushes use the platform Git proxy. GitHub API access is separately scoped:
 network draft alone does not prove access has changed. Render deployment also
 requires access to the participant's Render account; a blueprint is not a
 live service.
+
+## Identity migrations and provisioning (phase 2)
+
+The container now runs `alembic upgrade head` before starting its single web
+process. Migration failure stops startup. For host development, from `backend`
+with DATABASE_URL exported:
+
+```sh
+../.venv/bin/alembic upgrade head
+```
+
+The schema contains branch identities, users, sessions, login attempts, and
+append-only audit records. Migrations are repeatable, and do not automatically
+create accounts. Never use `create_all` to substitute for migrations. Do not
+run application migrations concurrently across multiple replicas; use a single
+release job if scaling beyond this initial deployment model.
+
+To create a first administrator, supply ADMIN_EMAIL, ADMIN_DISPLAY_NAME, and
+ADMIN_PASSWORD securely to the process, then run `python -m app.cli init-admin`
+from `backend` using the activated virtual environment. The password must be
+12–128 characters. No password values belong in Git or shell history. Provisioning
+refuses to overwrite an existing account. For example, enter the password
+through a terminal's hidden prompt rather than embedding it in a command:
+
+```sh
+read -r -s -p 'Admin password: ' ADMIN_PASSWORD
+export ADMIN_PASSWORD
+python -m app.cli init-admin
+unset ADMIN_PASSWORD
+```
+
+For a separate, empty development database only, set DEMO_PASSWORD securely
+and run `python -m app.cli seed-demo`. It creates a synthetic branch and five
+accounts: super_admin@example.invalid, finance_reviewer@example.invalid,
+content_editor@example.invalid, branch_lead@example.invalid, hr_lead@example.invalid.
+They share the supplied demo password; no default is built in. This is not the
+official sample dataset, and the command refuses production and nonempty
+identity databases. Use unique strong credentials for any public judge accounts.
+
+A Super Admin can create users through the bilingual interface. Existing
+branch assignments are selectable; branch creation/lifecycle administration
+will arrive in the next domain phase. There are no password reset or user
+update/deactivation interfaces yet. Recover administrative access through an
+explicitly reviewed operator procedure, never by silently resetting passwords
+in the seed command.
+
+Production requires PUBLIC_ORIGIN with an exact HTTPS origin; on Render the
+injected RENDER_EXTERNAL_URL is the fallback. Changing to a custom domain
+requires updating PUBLIC_ORIGIN. Local Compose intentionally sets development
+mode and http://localhost:8000; use that origin for browser login. Hot reload
+also permits the explicitly configured http://localhost:5173 origin. Do not
+carry the local development override into Render.

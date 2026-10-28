@@ -3,10 +3,12 @@
 A bilingual volunteer-organisation management platform for ShipLens Challenge
 01. Built by Danish Ahmed with FastAPI, React/TypeScript, and PostgreSQL.
 
-**Current milestone: foundation only.** Database-aware health checks and a
-bilingual React shell are implemented. Authentication, business workflows,
-public content pages, demo logins, and official sample-data reconciliation are
-not yet implemented. There is no confirmed live deployment yet.
+**Current milestone: authentication and audit foundation.** Database-aware
+health, a bilingual React login workspace, five roles, scoped branch/audit
+reads, Super Admin user creation, PostgreSQL migrations, and append-only
+auditing are implemented. Membership, money/reporting workflows, seven public
+content pages, and official sample-data reconciliation remain future phases.
+There is no confirmed live Render deployment yet.
 
 ## Local setup
 
@@ -44,6 +46,7 @@ set -a
 . ./.env
 set +a
 cd backend
+../.venv/bin/alembic upgrade head
 ../.venv/bin/uvicorn app.asgi:app --host 0.0.0.0 --port 8000 --reload
 ```
 
@@ -69,7 +72,7 @@ npm run build
 `TEST_DATABASE_URL` must point to PostgreSQL to run integration checks.
 An absent variable means integration tests are skipped, not passed. The CI
 pipeline supplies a PostgreSQL test service and enforces backend coverage of
-at least 60%. Present coverage describes the foundation only; later features
+at least 60%. Present coverage describes the implemented phases only; later features
 must retain coverage and add permission/business-rule tests.
 
 ## Deploy and contribute
@@ -90,3 +93,12 @@ open-source licences. The self-hosted Noto Nastaliq Urdu font is distributed
 through Fontsource under the SIL Open Font License 1.1; see
 [third-party notices](docs/third-party-notices.md). Dependency versions are
 recorded in the Python hash locks and npm lockfile.
+
+## First login
+
+Accounts are created explicitly; no public default password exists. See
+[provisioning instructions](docs/handover.md#identity-migrations-and-provisioning-phase-2)
+for secure first-admin creation and the synthetic nonproduction demo seed.
+Use http://localhost:8000 for local Compose login, or http://localhost:5173
+for Vite hot reload. Production requires an exact HTTPS PUBLIC_ORIGIN
+(defaults to RENDER_EXTERNAL_URL on Render) and uses Secure cookies.

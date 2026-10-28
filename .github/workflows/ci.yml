@@ -33,6 +33,12 @@ jobs:
           cache-dependency-path: backend/requirements-dev.txt
       - run: pip install --require-hashes -r requirements-dev.txt
       - run: ruff check .
+      - name: Apply and reapply PostgreSQL migrations
+        env:
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/shiplens_test
+        run: |
+          alembic upgrade head
+          alembic upgrade head
       - run: pytest --cov=app --cov-report=term-missing --cov-report=xml
       - uses: actions/upload-artifact@v4
         with:

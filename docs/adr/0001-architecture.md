@@ -18,8 +18,7 @@ persistent domain models are introduced. Keep authorization and audit writes
 in the same application service path as each mutation.
 
 Production authentication will use secure, HttpOnly cookie sessions, CSRF
-protection for mutations, and server-side role and branch checks. This is a
-planned decision, not an implemented capability in phase 1.
+protection for mutations, and server-side role and branch checks. This is implemented in phase 2; see ADR 0002 for the security contract.
 
 Store timestamps in UTC and display Asia/Karachi. Proposed reporting weeks are
 Monday 00:00 through the following Monday 00:00 in Asia/Karachi, using half-open
@@ -32,4 +31,5 @@ constraints, and transactions for concurrent changes.
 A single deployment reduces CORS and operational complexity. FastAPI provides
 OpenAPI documentation; React needs explicit translation and accessibility
 checks. PostgreSQL is required in integration tests rather than substituting
-SQLite. Domain migrations, sessions, and business workflows remain future work.
+SQLite. Identity migrations and sessions are introduced in phase 2. Membership,
+collections, reporting, and publishing workflows remain later phases.

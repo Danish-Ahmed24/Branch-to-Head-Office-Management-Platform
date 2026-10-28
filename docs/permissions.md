@@ -1,7 +1,8 @@
-# Proposed permission matrix
+# Permission matrix and implementation status
 
-This is the implementation contract for phase 2, not a claim that roles exist
-in the phase 1 application. All permissions default to denied. Public access
+Phase 2 implements login for all five roles, user list/create permissions,
+scoped branch reads, and scoped audit reads. The remaining rows are the
+contract for future domain endpoints, not implemented features. All permissions default to denied. Public access
 is limited to published content, active public branch information, and
 submitting volunteer applications. Public health responses contain no secrets.
 
@@ -33,3 +34,8 @@ denial, cross-branch identifier substitution, export, and state transition.
 
 Proposed branch transitions: Forming → Active or Closed; Active → Paused or
 Closed; Paused → Active or Closed; Closed is terminal. Codes are never reused.
+
+Phase 2 has no audit mutation endpoints. PostgreSQL also rejects direct audit
+UPDATE, DELETE, and TRUNCATE. Role/session, branch scope, and mutation CSRF
+checks are exercised against a real PostgreSQL database. User update, role
+reassignment, branch mutation, and all remaining domain operations are pending.
